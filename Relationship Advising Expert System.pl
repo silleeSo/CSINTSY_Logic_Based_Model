@@ -146,32 +146,88 @@ start :-
     format('Based on your MBTI, your communication style is: ~w', [UserCommunicationStyle]), nl,
     recommend_love_language(UserMBTI, UserLoveLanguage),
     format('Based on your MBTI, your love language is: ~w', [UserLoveLanguage]), nl,
-    prompt_user(interest, UserInterest),
-    prompt_user(value, UserValue),
-    recommend(UserMBTI, UserAttachmentStyle, UserLoveLanguage, UserInterest, UserValue, UserCommunicationStyle).
+    rank_values(UserValues),
+    prompt_top_interests(UserInterests),
+    recommend(UserMBTI, UserAttachmentStyle, UserLoveLanguage, UserInterests, UserValues, UserCommunicationStyle).
 
+% Prompt user for MBTI
 prompt_user(Type, UserInput) :-
     format('Please enter your ~w (', [Type]),
     findall(X, call(Type, X), List),
     format_list(List),
     write('): '), nl,
-    read_line_to_codes(user_input, Codes),
-    atom_codes(InputAtom, Codes),
+    read_line_to_string(user_input, InputString),
+    atom_string(InputAtom, InputString),
     (call(Type, InputAtom) -> UserInput = InputAtom ; write('Invalid input. Please try again.'), nl, prompt_user(Type, UserInput)).
 
+% Format list for displaying options
 format_list([Last]) :- !, write(Last).
 format_list([Head|Tail]) :- write(Head), write(', '), format_list(Tail).
 
-recommend(UserMBTI, UserAttachmentStyle, UserLoveLanguage, UserInterest, UserValue, UserCommunicationStyle) :-
+% Rank values from 1 to 8
+rank_values(UserValues) :-
+    write('Please rank the following values from 1 to 8:'), nl,
+    findall(Value, value(Value), Values),
+    rank_values_list(Values, UserValues).
+
+rank_values_list([], []).
+rank_values_list([Value|Rest], [Value-Rank|UserValues]) :-
+    format('Rank for ~w: ', [Value]),
+    read_line_to_string(user_input, RankString),
+    atom_number(RankString, Rank),
+    rank_values_list(Rest, UserValues).
+
+% Prompt user for top 3 interests
+prompt_top_interests(UserInterests) :-
+    write('Please select your top 3 interests from the following:'), nl,
+    findall(Interest, interest(Interest), Interests),
+    format_list(Interests), nl,
+    select_top_interests(3, [], UserInterests).
+
+select_top_interests(0, Selected, Selected) :- !.
+select_top_interests(N, Selected, UserInterests) :-
+    format('Select interest ~w: ', [N]),
+    read_line_to_string(user_input, InterestString),
+    atom_string(Interest, InterestString),
+    (interest(Interest), \+ member(Interest, Selected) ->
+        N1 is N - 1,
+        select_top_interests(N1, [Interest|Selected], UserInterests)
+    ;
+        write('Invalid or duplicate interest. Please try again.'), nl,
+        select_top_interests(N, Selected, UserInterests)
+    ).
+
+% Recommendation based on user's inputs
+recommend(UserMBTI, UserAttachmentStyle, UserLoveLanguage, UserInterests, UserValues, UserCommunicationStyle) :-
     recommend_partner(UserMBTI, Partner),
     format('Your recommended partner MBTI type is: ~w', [Partner]), nl,
-    recommend_interest(UserInterest, InterestRecommendation),
-    format('Your recommended interest match is: ~w', [InterestRecommendation]), nl,
-    recommend_value(UserValue, ValueRecommendation),
-    format('Your recommended value match is: ~w', [ValueRecommendation]), nl,
+    recommend_top_interests(UserInterests, InterestRecommendations),
+    format('Your recommended interest matches are: ~w', [InterestRecommendations]), nl,
+    recommend_top_values(UserValues, ValueRecommendations),
+    format('Your recommended value matches are: ~w', [ValueRecommendations]), nl,
     format('Your recommended attachment style match is: ~w', [UserAttachmentStyle]), nl,
     format('Your recommended communication style match is: ~w', [UserCommunicationStyle]), nl,
     format('Your recommended love language match is: ~w', [UserLoveLanguage]), nl.
+
+% Recommend top 3 interests
+recommend_top_interests(UserInterests, Recommendations) :-
+    length(UserInterests, Length),
+    (Length >= 3 ->
+        findall(X, (member(X, UserInterests)), RecommendationsList),
+        length(Recommendations, 3),
+        append(Recommendations, _, RecommendationsList)
+    ;
+        Recommendations = UserInterests).
+
+% Recommend top 3 values based on ranking
+recommend_top_values(UserValues, Recommendations) :-
+    sort(2, @=<, UserValues, SortedValues),
+    top_n(SortedValues, 3, Recommendations).
+
+top_n(_, 0, []) :- !.
+top_n([Value-_|Rest], N, [Value|Recommendations]) :-
+    N1 is N - 1,
+    top_n(Rest, N1, Recommendations).
 
 % Run the program
 :- start.
