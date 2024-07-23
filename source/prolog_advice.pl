@@ -114,7 +114,9 @@ possible_communication_style(esfj, assertive).
 
 % Facts for complementing love language
 complementing_love_language(acts_of_service, receiving_gifts).
+complementing_love_language(receiving_gifts, acts_of_service).
 complementing_love_language(words_of_affirmation, quality_time).
+complementing_love_language(quality_time, words_of_affirmation).
 complementing_love_language(physical_touch, quality_time).
 
 % Facts about values complements
