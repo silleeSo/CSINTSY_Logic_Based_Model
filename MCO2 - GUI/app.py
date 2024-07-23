@@ -1,8 +1,22 @@
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk, ImageSequence
+import sys
 import os
 from functools import partial
+
+
+class StdRedirector(object):
+    def __init__(self, stream):
+        self.stream = stream
+
+    def write(self, message):
+        pass  # Suppress the message
+
+    def flush(self):
+        pass  # Do nothing
+    
+sys.stderr = StdRedirector(sys.stderr)
 
 # Initialize the main window
 root = tk.Tk()
@@ -27,6 +41,14 @@ frames = [ImageTk.PhotoImage(frame.copy().convert('RGBA')) for frame in ImageSeq
 
 # Function to keep track of the current page
 page_counter = 0
+
+
+# Inputs for prolog
+input_selected_mbti = None
+input_love_language = None
+input_ranked_values = []
+input_selected_interests = []
+
 
 def add_to_counter():
     global page_counter
@@ -107,6 +129,8 @@ def mbti_selection():
     def update_mbti(index):
         mbti_label.config(image=photos[index])
         mbti_label.image = photos[index]
+        global input_selected_mbti
+        input_selected_mbti = mbti_types[index]  # Update the global variable
 
     # Function to show the next MBTI type
     def next_mbti():
@@ -275,6 +299,9 @@ def lovelanguage_selection():
     def update_love_language(index):
         love_language_label.config(image=photos[index])
         love_language_label.image = photos[index]
+        global input_love_language
+        input_love_language = love_language[index]  
+        
 
     # Function to show the next MBTI type
     def next_love_language():
@@ -341,15 +368,11 @@ def rank_values():
     values_background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
     # List of items to rank
-    value_items = ["Family", "Friends", "Career", "Personal Growth", "Community", "Independece"]
-
-    # Calculate the maximum width of the items for padding
-    max_length = max(len(item) for item in value_items)
-    value_items_centered = [item.center(max_length, '\u00A0') for item in value_items]
+    value_items = ["Family", "Friends", "Career", "Personal Growth", "Community", "Independence"]
 
     # Listbox for displaying items
     value_listbox = tk.Listbox(root, font=("Helvetica", 42), bg="#FFCCFF", selectmode=tk.SINGLE, justify='center')
-    for item in value_items_centered:
+    for item in value_items:
         value_listbox.insert(tk.END, item)
     value_listbox.place(relx=0.5, rely=0.53, anchor=tk.CENTER, width=650, height=400)
 
@@ -370,7 +393,7 @@ def rank_values():
     next_button.place(relx=0.5, y=900, anchor=tk.CENTER)
     add_to_counter()
 
-
+# Function to handle checking interests
 def check_interests():
     # Clear the current widgets
     for widget in root.winfo_children():
@@ -378,7 +401,7 @@ def check_interests():
 
     # Load and display the background image
     global interests_background_photo, next_button_photo, checked_image, unchecked_image  # Keep a reference to avoid garbage collection
-    interests_image_path = os.path.join(script_dir, "Assets", "Background","interest_background_photo.png")
+    interests_image_path = os.path.join(script_dir, "Assets", "Background", "interest_background_photo.png")
     interests_background_image = Image.open(interests_image_path)
     interests_background_photo = ImageTk.PhotoImage(interests_background_image)
       
@@ -389,8 +412,8 @@ def check_interests():
     checked_image_path = os.path.join(script_dir,"Assets", "Buttons", "checked.png")
     unchecked_image_path = os.path.join(script_dir, "Assets", "Buttons","unchecked.png")
     try:
-        checked_image = ImageTk.PhotoImage(Image.open(checked_image_path).resize((75, 75), Image.Resampling.LANCZOS))
-        unchecked_image = ImageTk.PhotoImage(Image.open(unchecked_image_path).resize((75, 75), Image.Resampling.LANCZOS))
+        checked_image = ImageTk.PhotoImage(Image.open(checked_image_path).resize((75, 75), Image.LANCZOS))
+        unchecked_image = ImageTk.PhotoImage(Image.open(unchecked_image_path).resize((75, 75), Image.LANCZOS))
         print("Images loaded successfully")
     except Exception as e:
         print(f"Error loading images: {e}")
@@ -410,11 +433,13 @@ def check_interests():
     selected_count = tk.IntVar(value=0)
 
     # Function to toggle checkbox images and restrict selection to three
-    def toggle_checkbox(var, btn):
+    def toggle_checkbox(var, btn, interest):
         if var.get():
             if selected_count.get() < 3:
                 btn.config(image=checked_image)
                 selected_count.set(selected_count.get() + 1)
+                if interest not in input_selected_interests:  # Prevent duplicates
+                    input_selected_interests.append(interest)
                 message_label.config(text="")
             else:
                 var.set(0)
@@ -422,6 +447,8 @@ def check_interests():
         else:
             btn.config(image=unchecked_image)
             selected_count.set(selected_count.get() - 1)
+            if interest in input_selected_interests:
+                input_selected_interests.remove(interest)
             message_label.config(text="")
 
     # Create checkboxes for left column
@@ -429,19 +456,19 @@ def check_interests():
         var = interest_vars[interest]
         btn = tk.Checkbutton(root, text=interest, font=("Helvetica", 32), variable=var, padx=20,
                              bg="#FFCCFF", highlightthickness=0, bd=0, selectcolor="#FFCCFF",
-                             image=unchecked_image, selectimage=checked_image, compound='left')
-        btn.config(command=partial(toggle_checkbox, var, btn))
+                             image=unchecked_image, compound='left')
+        btn.config(command=partial(toggle_checkbox, var, btn, interest))
         btn.image = unchecked_image  # Keep a reference to avoid garbage collection
         btn.selectimage = checked_image  # Keep a reference to avoid garbage collection
-        btn.place(relx=0.20, rely=0.35 + i*0.096,  anchor=tk.W)
+        btn.place(relx=0.20, rely=0.35 + i*0.096, anchor=tk.W)
 
     # Create checkboxes for right column
     for i, interest in enumerate(interests_right):
         var = interest_vars[interest]
         btn = tk.Checkbutton(root, text=interest, font=("Helvetica", 32), variable=var, 
                              bg="#FFCCFF", highlightthickness=0, bd=0, selectcolor="#FFCCFF", padx=20, 
-                             image=unchecked_image, selectimage=checked_image, compound='left')
-        btn.config(command=partial(toggle_checkbox, var, btn))
+                             image=unchecked_image, compound='left')
+        btn.config(command=partial(toggle_checkbox, var, btn, interest))
         btn.image = unchecked_image  # Keep a reference to avoid garbage collection
         btn.selectimage = checked_image  # Keep a reference to avoid garbage collection
         btn.place(relx=0.58, rely=0.35 + i*0.096, anchor=tk.W)
@@ -462,7 +489,6 @@ def check_interests():
     next_button.image = next_button_photo  # Keep a reference to avoid garbage collection
     next_button.place(relx=0.5, rely=0.85, anchor=tk.CENTER)
     add_to_counter()
-
 
 
 
@@ -487,10 +513,16 @@ def result():
     done_button = tk.Button(root, image=done_button_photo, command=close_window,
                             background='#DD7FBA', activebackground="lightpink", bd=0)
     done_button.place(relx=0.5, rely=0.85, anchor=tk.CENTER)
+    print_inputs()
     add_to_counter()
 
 
 
+def print_inputs():
+    print("Selected MBTI:", input_selected_mbti)
+    print("Selected Love Language:", input_love_language)
+    print("Ranked Values:", input_ranked_values)
+    print("Selected Interests:", input_selected_interests)
 
 
 
@@ -513,6 +545,7 @@ def move_up():
     value_listbox.delete(selected_index)
     value_listbox.insert(selected_index - 1, item)
     value_listbox.select_set(selected_index - 1)
+    update_ranked_values()
 
 def move_down():
     selected_index = value_listbox.curselection()
@@ -525,6 +558,11 @@ def move_down():
     value_listbox.delete(selected_index)
     value_listbox.insert(selected_index + 1, item)
     value_listbox.select_set(selected_index + 1)
+    update_ranked_values()
+
+def update_ranked_values():
+    global input_ranked_values
+    input_ranked_values = [value_listbox.get(i) for i in range(value_listbox.size())]
 
 def update_tip():
     global tip_index
