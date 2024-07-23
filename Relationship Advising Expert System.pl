@@ -73,63 +73,67 @@ compatible(isfp, estp).
 compatible(estp, isfp).
 compatible(esfj, istj).
 
-% Rules for recommending partner based on MBTI
-recommend_partner(MBTI, Partner) :- compatible(MBTI, Partner).
 
-% Rules for recommending attachment style based on MBTI
-recommend_attachment_style(intj, avoidant).
-recommend_attachment_style(entp, secure).
-recommend_attachment_style(infj, anxious).
-recommend_attachment_style(enfp, anxious).
-recommend_attachment_style(isfj, secure).
-recommend_attachment_style(estj, secure).
-recommend_attachment_style(esfp, secure).
-recommend_attachment_style(istp, avoidant).
-recommend_attachment_style(intp, avoidant).
-recommend_attachment_style(entj, secure).
-recommend_attachment_style(infp, anxious).
-recommend_attachment_style(enfj, secure).
-recommend_attachment_style(istj, secure).
-recommend_attachment_style(isfp, anxious).
-recommend_attachment_style(estp, secure).
-recommend_attachment_style(esfj, secure).
+
+% Facts for recommending attachment style based on MBTI
+ideal_attachment_style(intj, avoidant).
+ideal_attachment_style(entp, secure).
+ideal_attachment_style(infj, anxious).
+ideal_attachment_style(enfp, anxious).
+ideal_attachment_style(isfj, secure).
+ideal_attachment_style(estj, secure).
+ideal_attachment_style(esfp, secure).
+ideal_attachment_style(istp, avoidant).
+ideal_attachment_style(intp, avoidant).
+ideal_attachment_style(entj, secure).
+ideal_attachment_style(infp, anxious).
+ideal_attachment_style(enfj, secure).
+ideal_attachment_style(istj, secure).
+ideal_attachment_style(isfp, anxious).
+ideal_attachment_style(estp, secure).
+ideal_attachment_style(esfj, secure).
 
 % Rules for recommending communication style based on MBTI
-recommend_communication_style(intj, assertive).
-recommend_communication_style(entp, assertive).
-recommend_communication_style(infj, passive).
-recommend_communication_style(enfp, assertive).
-recommend_communication_style(isfj, passive).
-recommend_communication_style(estj, assertive).
-recommend_communication_style(esfp, assertive).
-recommend_communication_style(istp, assertive).
-recommend_communication_style(intp, passive).
-recommend_communication_style(entj, assertive).
-recommend_communication_style(infp, passive).
-recommend_communication_style(enfj, assertive).
-recommend_communication_style(istj, assertive).
-recommend_communication_style(isfp, passive).
-recommend_communication_style(estp, assertive).
-recommend_communication_style(esfj, assertive).
+ideal_communication_style(intj, assertive).
+ideal_communication_style(entp, assertive).
+ideal_communication_style(infj, passive).
+ideal_communication_style(enfp, assertive).
+ideal_communication_style(isfj, passive).
+ideal_communication_style(estj, assertive).
+ideal_communication_style(esfp, assertive).
+ideal_communication_style(istp, assertive).
+ideal_communication_style(intp, passive).
+ideal_communication_style(entj, assertive).
+ideal_communication_style(infp, passive).
+ideal_communication_style(enfj, assertive).
+ideal_communication_style(istj, assertive).
+ideal_communication_style(isfp, passive).
+ideal_communication_style(estp, assertive).
+ideal_communication_style(esfj, assertive).
 
-% Rules for recommending love language based on MBTI
-recommend_love_language(intj, acts_of_service).
-recommend_love_language(entp, words_of_affirmation).
-recommend_love_language(infj, quality_time).
-recommend_love_language(enfp, words_of_affirmation).
-recommend_love_language(isfj, acts_of_service).
-recommend_love_language(estj, acts_of_service).
-recommend_love_language(esfp, physical_touch).
-recommend_love_language(istp, physical_touch).
-recommend_love_language(intp, quality_time).
-recommend_love_language(entj, acts_of_service).
-recommend_love_language(infp, words_of_affirmation).
-recommend_love_language(enfj, quality_time).
-recommend_love_language(istj, acts_of_service).
-recommend_love_language(isfp, physical_touch).
-recommend_love_language(estp, physical_touch).
-recommend_love_language(esfj, words_of_affirmation).
+% Facts for recommending love language based on MBTI
+ideal_love_language(intj, acts_of_service).
+ideal_love_language(entp, words_of_affirmation).
+ideal_love_language(infj, quality_time).
+ideal_love_language(enfp, words_of_affirmation).
+ideal_love_language(isfj, acts_of_service).
+ideal_love_language(estj, acts_of_service).
+ideal_love_language(esfp, physical_touch).
+ideal_love_language(istp, physical_touch).
+ideal_love_language(intp, quality_time).
+ideal_love_language(entj, acts_of_service).
+ideal_love_language(infp, words_of_affirmation).
+ideal_love_language(enfj, quality_time).
+ideal_love_language(istj, acts_of_service).
+ideal_love_language(isfp, physical_touch).
+ideal_love_language(estp, physical_touch).
+ideal_love_language(esfj, words_of_affirmation).
 
+% Rules 
+recommended_partner(MBTI, Partner) :- compatible(MBTI, Partner).
+recommended_attachment_style(MBTI, AttachmentStyle) :- ideal_attachment_style(MBTI, AttachmentStyle)
+recommended_communication_style(MBTI, CommunicationStyle) :- ideal_communication_style(MBTI, CommunicationStyle)
+recommended_love_language(MBTI, LoveLanguage) :- ideal_love_language(MBTI, LoveLanguage)
 % Rules for recommending interest
 recommend_interest(Interest, PartnerInterest) :- interest(Interest), interest(PartnerInterest).
 

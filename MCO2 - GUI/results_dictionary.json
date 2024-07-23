@@ -1,0 +1,63 @@
+{
+    "mbti_types": {
+      "intj": "Introverted, Intuitive, Thinking, Judging - Visionary and strategic thinkers who are highly analytical and goal-oriented. They excel at long-term planning and are independent and self-sufficient.",
+      "entp": "Extraverted, Intuitive, Thinking, Perceiving - Innovative and clever problem-solvers who enjoy debating and exploring new ideas. They are adaptable, resourceful, and thrive on intellectual challenges.",
+      "infj": "Introverted, Intuitive, Feeling, Judging - Insightful and empathetic individuals who are deeply concerned with the well-being of others. They have a strong sense of vision and idealism, often driven by their values and principles.",
+      "enfp": "Extraverted, Intuitive, Feeling, Perceiving - Enthusiastic and imaginative individuals who are deeply empathetic and seek meaningful connections. They are spontaneous, creative, and driven by their values.",
+      "isfj": "Introverted, Sensing, Feeling, Judging - Practical and reliable caretakers who are attentive to detail and dedicated to helping others. They value stability and are deeply loyal to their loved ones.",
+      "estj": "Extraverted, Sensing, Thinking, Judging - Organized and efficient leaders who are pragmatic and results-oriented. They value structure and order, excelling in management and decision-making.",
+      "esfp": "Extraverted, Sensing, Feeling, Perceiving - Playful and outgoing individuals who live in the moment and enjoy engaging with others. They are spontaneous, energetic, and love to entertain.",
+      "istp": "Introverted, Sensing, Thinking, Perceiving - Observant and practical problem-solvers who are independent and adaptable. They enjoy hands-on activities and are skilled at troubleshooting.",
+      "intp": "Introverted, Intuitive, Thinking, Perceiving - Logical and curious thinkers who enjoy exploring abstract concepts and theoretical ideas. They are independent, analytical, and value intellectual autonomy.",
+      "entj": "Extraverted, Intuitive, Thinking, Judging - Bold and strategic leaders who are decisive and goal-oriented. They excel at organizing and directing teams to achieve their objectives.",
+      "infp": "Introverted, Intuitive, Feeling, Perceiving - Idealistic and empathetic individuals who are driven by their values and a desire for personal authenticity. They are creative, introspective, and seek deep connections.",
+      "enfj": "Extraverted, Intuitive, Feeling, Judging - Charismatic and inspiring leaders who are deeply concerned with the well-being of others. They are organized, supportive, and skilled at motivating and leading.",
+      "istj": "Introverted, Sensing, Thinking, Judging - Reliable and detail-oriented individuals who value tradition and responsibility. They are practical, methodical, and committed to their duties.",
+      "isfp": "Introverted, Sensing, Feeling, Perceiving - Gentle and artistic individuals who appreciate beauty and personal expression. They are sensitive, spontaneous, and value harmony and authenticity.",
+      "estp": "Extraverted, Sensing, Thinking, Perceiving - Energetic and action-oriented individuals who thrive on excitement and new experiences. They are practical, resourceful, and enjoy taking risks.",
+      "esfj": "Extraverted, Sensing, Feeling, Judging - Warm and caring individuals who prioritize harmony and helping others. They are sociable, organized, and value traditions and social connections."
+    },
+    "communication_styles": {
+      "assertive": "Clear and respectful communication ensures that both partners feel heard and understood.",
+      "passive": "Gentle and considerate communication fosters a harmonious connection.",
+      "aggressive": "Direct and forceful communication style that can sometimes lead to conflicts if not managed well.",
+      "passive_aggressive": "Indirect communication that requires careful attention to underlying emotions and intentions."
+    },
+    "attachment_styles": {
+      "secure": "Understanding and addressing each other's needs can lead to a secure and loving bond.",
+      "anxious": "Seeking reassurance and closeness in relationships to feel secure.",
+      "avoidant": "Maintaining independence and emotional distance to feel secure.",
+      "fearful_avoidant": "Navigating complexities with patience and understanding can strengthen the bond."
+    },
+    "values": {
+      "family": "Prioritizing family ensures a shared commitment to strong, supportive relationships.",
+      "career": "Valuing career growth fosters mutual support for professional ambitions and successes.",
+      "friends": "Cherishing friendships strengthens social bonds and a sense of community.",
+      "personal_growth": "Focusing on self-improvement and development leads to a fulfilling and evolving relationship.",
+      "adventure": "Embracing new experiences together keeps the relationship exciting and dynamic.",
+      "stability": "Seeking stability ensures a secure and predictable foundation for the relationship.",
+      "independence": "Valuing independence supports mutual respect for personal space and individuality.",
+      "community": "Engaging in community activities together fosters a sense of belonging and shared purpose."
+    },
+    "interests": {
+      "reading": "Sharing a love for books can create deep and meaningful conversations.",
+      "traveling": "Exploring new places together fosters shared experiences and unforgettable memories.",
+      "sports": "Enjoying physical activities together strengthens both the body and the relationship.",
+      "music": "Connecting through shared musical tastes and experiences brings harmony and joy.",
+      "cooking": "Creating delicious meals together can be a fun and bonding experience.",
+      "art": "Appreciating and creating art together nurtures creativity and emotional expression.",
+      "gaming": "Playing games together can be a fun and engaging way to bond and enjoy shared interests.",
+      "hiking": "Exploring nature together promotes physical health and a sense of adventure.",
+      "pet_care": "Caring for pets together can build a sense of responsibility and joy.",
+      "writing": "Writing together or sharing written work can foster creativity and communication.",
+      "science": "Exploring scientific topics together can stimulate intellectual curiosity and bonding."
+    },
+    "love_languages": {
+      "words_of_affirmation": "Kind and encouraging words that make you feel valued and appreciated.",
+      "acts_of_service": "Thoughtful actions that demonstrate care and support, making life easier and more pleasant.",
+      "receiving_gifts": "Meaningful presents that show love and appreciation through tangible items.",
+      "quality_time": "Undivided attention and shared moments that create strong bonds and deep connections.",
+      "physical_touch": "Affectionate gestures and physical closeness that provide comfort and intimacy."
+    }
+  }
+  
