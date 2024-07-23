@@ -1,16 +1,29 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import font as tkfont
 from PIL import Image, ImageTk, ImageSequence
+import sys
 import os
 from functools import partial
-#from pyswip import Prolog, PrologError
+import json
 import janus_swi as janus
-
-
 
 #prolog = Prolog()
 janus.consult("prolog_advice.pl")
+#read dictionary for more detailed results
+with open('results_dictionary.json', 'r') as file:
+    data = json.load(file)
+class StdRedirector(object):
+    def __init__(self, stream):
+        self.stream = stream
 
+    def write(self, message):
+        pass  # Suppress the message
+
+    def flush(self):
+        pass  # Do nothing
+    
+sys.stderr = StdRedirector(sys.stderr)
 
 # Initialize the main window
 root = tk.Tk()
@@ -33,10 +46,87 @@ gif_path = os.path.join(script_dir,"Assets", "Buttons", "start_button.gif")
 gif_image = Image.open(gif_path)
 frames = [ImageTk.PhotoImage(frame.copy().convert('RGBA')) for frame in ImageSequence.Iterator(gif_image)]
 
-
-
 # Function to keep track of the current page
 page_counter = 0
+
+
+# Inputs for prolog
+input_selected_mbti = None
+input_love_language = None
+input_ranked_values = []
+input_selected_interests = []
+
+#PROLOG Query Funtions
+def get_pl_attachment_style(mbti):
+    query = f"recommended_attachment_style({mbti}, Style)."
+    result = list(janus.query(query))
+    if result:
+        style = result[0]['Style']
+        return style
+    else:
+        return "No attachment style found."
+    
+def get_pl_communication_style(mbti):
+    query = f"recommended_communication_style({mbti}, Style)."
+    result = list(janus.query(query))
+    if result:
+        style = result[0]['Style']
+        return style
+    else:
+        return "No commmunication style found."
+def get_pl_partner_match(mbti):
+    query = f"recommended_partner({mbti}, Partner)."
+    result = list(janus.query(query))
+    if result:
+        style = result[0]['Partner']
+        return style
+    else:
+        return "No partner match found."
+def get_pl_partner_love_language(loveLanguage):
+    query = f"recommended_partner_love_language({loveLanguage.lower().replace(" ", "_")}, Language)."
+    result = list(janus.query(query))
+    if result:
+        language = result[0]['Language']
+        return language
+    else:
+        return "No love language found."
+def get_partner_value(value):
+    query = f"recommended_partner_value({value.lower().replace(" ", "_")}, PartnerValue)."
+    result = list(janus.query(query))
+    if result:
+        partner_value = result[0]['PartnerValue']
+        return partner_value
+    else:
+        return "No complement found."
+def get_partner_interest(interest):
+    query = f"recommended_partner_interest({interest.lower().replace(" ", "_")}, PartnerInterest)."
+    result = list(janus.query(query))
+    if result:
+        partner_interest = result[0]['PartnerInterest']
+        return partner_interest
+    else:
+        return "No complement found."
+def get_pl_partner_values(values):
+    complementingValues = []
+    for value in values:
+        print("Value: ", value)
+        complementingValues.append(get_partner_value(value))
+    return complementingValues
+
+def get_pl_partner_interests(interests):
+    complementingValues = []
+    for interest in interests:
+        print("Interest: ", interest)
+        complementingValues.append(get_partner_interest(interest))
+    return complementingValues
+
+def show_pl_results(text):
+    print("Value diplayed: ", text)
+    bg_color = "#e188b4"
+    label_font = tkfont.Font(family="Helvetica", size=45, weight="bold")
+    advice_label = tk.Label(root, text="Advice will be shown here.", height= 120, width=15,bg=bg_color, font=label_font)
+    advice_label.pack(pady=500, padx=20, anchor='center')
+    advice_label.config(text=f"{text.upper().replace("_", " ")}")
 
 def add_to_counter():
     global page_counter
@@ -117,6 +207,8 @@ def mbti_selection():
     def update_mbti(index):
         mbti_label.config(image=photos[index])
         mbti_label.image = photos[index]
+        global input_selected_mbti
+        input_selected_mbti = mbti_types[index]  # Update the global variable
 
     # Function to show the next MBTI type
     def next_mbti():
@@ -207,25 +299,13 @@ def loading_screen():
 
     # Schedule transition to next page after 10 seconds (10000 milliseconds)
     add_to_counter()
-
+    #TO CHANGE LOADING TIME
     if page_counter < 5:
-        root.after(10000, attachment_style)
+        root.after(10, attachment_style)
     else:
-        root.after(10000, result)
+        root.after(10, result)
 
-def get_pl_attachment_style(mbti):
-    # Formulate the Prolog query
-    query = f"recommend_attachment_style({mbti}, Style)."
     
-    # Execute the query
-    result = list(janus.query(query))
-    
-    # Extract and return the advice
-    if result:
-        style = result[0]['Style']
-        return style
-    else:
-        return "No attachment style found."
 def attachment_style():
     # Clear the current widgets
     for widget in root.winfo_children():
@@ -246,9 +326,11 @@ def attachment_style():
 
     proceed_button = tk.Button(root, image=proceed_button_photo, command=communication_style, background='#DD7FBA', activebackground="lightpink", highlightthickness=5, bd=0)
     proceed_button.place(x=1200, y=750, anchor=tk.CENTER)
-    advice = get_pl_attachment_style("enfp")
-    print("Your attachment style is: ", advice)
     add_to_counter()
+
+    #query Prolog
+    advice = get_pl_attachment_style(input_selected_mbti.lower())
+    show_pl_results(advice)
 
 
 def communication_style():
@@ -272,6 +354,10 @@ def communication_style():
     proceed_button = tk.Button(root, image=proceed_button_photo, command=lovelanguage_selection, background='#DD7FBA', activebackground="lightpink", highlightthickness=5, bd=0)
     proceed_button.place(x=1200, y=750, anchor=tk.CENTER)
     add_to_counter()
+
+    #query Prolog
+    advice = get_pl_communication_style(input_selected_mbti.lower())
+    show_pl_results(advice)
 
 
 # Function to handle Love Language selection slideshow
@@ -299,6 +385,9 @@ def lovelanguage_selection():
     def update_love_language(index):
         love_language_label.config(image=photos[index])
         love_language_label.image = photos[index]
+        global input_love_language
+        input_love_language = love_language[index]  
+        
 
     # Function to show the next MBTI type
     def next_love_language():
@@ -341,6 +430,10 @@ def lovelanguage_selection():
     update_love_language(current_index[0])
     add_to_counter()
 
+    #query Prolog
+    #advice = get_pl_love_language(input_selected_mbti.lower())
+    #show_pl_results(advice)
+
 
 def rank_values():
     # Clear the current widgets
@@ -365,15 +458,11 @@ def rank_values():
     values_background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
     # List of items to rank
-    value_items = ["Family", "Friends", "Career", "Personal Growth", "Community", "Independece"]
-
-    # Calculate the maximum width of the items for padding
-    max_length = max(len(item) for item in value_items)
-    value_items_centered = [item.center(max_length, '\u00A0') for item in value_items]
+    value_items = ["Family", "Friends", "Career", "Personal Growth", "Community", "Independence"]
 
     # Listbox for displaying items
     value_listbox = tk.Listbox(root, font=("Helvetica", 42), bg="#FFCCFF", selectmode=tk.SINGLE, justify='center')
-    for item in value_items_centered:
+    for item in value_items:
         value_listbox.insert(tk.END, item)
     value_listbox.place(relx=0.5, rely=0.53, anchor=tk.CENTER, width=650, height=400)
 
@@ -394,7 +483,7 @@ def rank_values():
     next_button.place(relx=0.5, y=900, anchor=tk.CENTER)
     add_to_counter()
 
-
+# Function to handle checking interests
 def check_interests():
     # Clear the current widgets
     for widget in root.winfo_children():
@@ -402,7 +491,7 @@ def check_interests():
 
     # Load and display the background image
     global interests_background_photo, next_button_photo, checked_image, unchecked_image  # Keep a reference to avoid garbage collection
-    interests_image_path = os.path.join(script_dir, "Assets", "Background","interest_background_photo.png")
+    interests_image_path = os.path.join(script_dir, "Assets", "Background", "interest_background_photo.png")
     interests_background_image = Image.open(interests_image_path)
     interests_background_photo = ImageTk.PhotoImage(interests_background_image)
       
@@ -413,8 +502,8 @@ def check_interests():
     checked_image_path = os.path.join(script_dir,"Assets", "Buttons", "checked.png")
     unchecked_image_path = os.path.join(script_dir, "Assets", "Buttons","unchecked.png")
     try:
-        checked_image = ImageTk.PhotoImage(Image.open(checked_image_path).resize((75, 75), Image.Resampling.LANCZOS))
-        unchecked_image = ImageTk.PhotoImage(Image.open(unchecked_image_path).resize((75, 75), Image.Resampling.LANCZOS))
+        checked_image = ImageTk.PhotoImage(Image.open(checked_image_path).resize((75, 75), Image.LANCZOS))
+        unchecked_image = ImageTk.PhotoImage(Image.open(unchecked_image_path).resize((75, 75), Image.LANCZOS))
         print("Images loaded successfully")
     except Exception as e:
         print(f"Error loading images: {e}")
@@ -425,7 +514,7 @@ def check_interests():
     message_label.place(relx=0.5, rely=0.1, anchor=tk.CENTER)
 
     # List of interests
-    interests_left = ["Reading", "Travelling", "Music", "Sports", "Arts"]
+    interests_left = ["Reading", "Traveling", "Music", "Sports", "Art"]
     interests_right = ["Cooking", "Writing", "Science", "Pet Care", "Gaming"]
 
     # Variables for checkboxes
@@ -434,11 +523,13 @@ def check_interests():
     selected_count = tk.IntVar(value=0)
 
     # Function to toggle checkbox images and restrict selection to three
-    def toggle_checkbox(var, btn):
+    def toggle_checkbox(var, btn, interest):
         if var.get():
             if selected_count.get() < 3:
                 btn.config(image=checked_image)
                 selected_count.set(selected_count.get() + 1)
+                if interest not in input_selected_interests:  # Prevent duplicates
+                    input_selected_interests.append(interest)
                 message_label.config(text="")
             else:
                 var.set(0)
@@ -446,6 +537,8 @@ def check_interests():
         else:
             btn.config(image=unchecked_image)
             selected_count.set(selected_count.get() - 1)
+            if interest in input_selected_interests:
+                input_selected_interests.remove(interest)
             message_label.config(text="")
 
     # Create checkboxes for left column
@@ -453,19 +546,19 @@ def check_interests():
         var = interest_vars[interest]
         btn = tk.Checkbutton(root, text=interest, font=("Helvetica", 32), variable=var, padx=20,
                              bg="#FFCCFF", highlightthickness=0, bd=0, selectcolor="#FFCCFF",
-                             image=unchecked_image, selectimage=checked_image, compound='left')
-        btn.config(command=partial(toggle_checkbox, var, btn))
+                             image=unchecked_image, compound='left')
+        btn.config(command=partial(toggle_checkbox, var, btn, interest))
         btn.image = unchecked_image  # Keep a reference to avoid garbage collection
         btn.selectimage = checked_image  # Keep a reference to avoid garbage collection
-        btn.place(relx=0.20, rely=0.35 + i*0.096,  anchor=tk.W)
+        btn.place(relx=0.20, rely=0.35 + i*0.096, anchor=tk.W)
 
     # Create checkboxes for right column
     for i, interest in enumerate(interests_right):
         var = interest_vars[interest]
         btn = tk.Checkbutton(root, text=interest, font=("Helvetica", 32), variable=var, 
                              bg="#FFCCFF", highlightthickness=0, bd=0, selectcolor="#FFCCFF", padx=20, 
-                             image=unchecked_image, selectimage=checked_image, compound='left')
-        btn.config(command=partial(toggle_checkbox, var, btn))
+                             image=unchecked_image, compound='left')
+        btn.config(command=partial(toggle_checkbox, var, btn, interest))
         btn.image = unchecked_image  # Keep a reference to avoid garbage collection
         btn.selectimage = checked_image  # Keep a reference to avoid garbage collection
         btn.place(relx=0.58, rely=0.35 + i*0.096, anchor=tk.W)
@@ -489,15 +582,14 @@ def check_interests():
 
 
 
-
 def result():
     # Clear the current widgets
     for widget in root.winfo_children():
         widget.destroy()
 
     global result_background_photo, done_button_photo  # Keep a reference to avoid garbage collection
-    result_image_path = os.path.join(script_dir, "Assets", "Background","result_background.png")
-    done_image_path = os.path.join(script_dir, "Assets", "Buttons","done_button.png")
+    result_image_path = os.path.join(script_dir, "Assets", "Background", "result_background.png")
+    done_image_path = os.path.join(script_dir, "Assets", "Buttons", "done_button.png")
 
     result_background_image = Image.open(result_image_path)
     done_button_image = Image.open(done_image_path)
@@ -507,14 +599,72 @@ def result():
 
     result_background_label = tk.Label(root, image=result_background_photo)
     result_background_label.place(x=0, y=0, relwidth=1, relheight=1)
-
+    
     done_button = tk.Button(root, image=done_button_photo, command=close_window,
                             background='#DD7FBA', activebackground="lightpink", bd=0)
     done_button.place(relx=0.5, rely=0.85, anchor=tk.CENTER)
+
+    print_inputs()
     add_to_counter()
 
+    # Query Prolog
+    partner_mbti = get_pl_partner_match(input_selected_mbti.lower())
+    partner_love_language = get_pl_partner_love_language(input_love_language)
+    partner_interests = get_pl_partner_interests(input_selected_interests)  # list of 3 strings
+    partner_values = get_pl_partner_values(input_ranked_values)  # list of 6 strings
+    
+    print("Partner MBTI: ", partner_mbti)
+    print("Partner Love Language: ", partner_love_language)
+    print("Partner Interests: ", partner_interests)
+    print("Partner Values Ranking: ", partner_values)
 
+    print("MBTI desc: ", data['mbti_types'][partner_mbti])
+    
+    bg_color = "#e188b4"
+    #show_pl_results(partner_mbti)
 
+    title_font = tkfont.Font(family="Helvetica", size=30, weight="bold")
+    body_font = tkfont.Font(family="Helvetica", size=15)
+
+    # Partner MBTI
+    mbti_title = tk.Label(root, text="Partner MBTI", bg=bg_color, font=title_font)
+    mbti_title.place(relx=0.5, y=200, anchor=tk.CENTER)  # Adjust y as needed
+    mbti_body1 = tk.Label(root, text=f"{partner_mbti.upper()}", bg=bg_color, font=body_font)
+    mbti_body1.place(relx=0.5, y=240, anchor=tk.CENTER)  # Adjust y as needed
+    mbti_body2 = tk.Label(root, text=f"{data['mbti_types'][partner_mbti]}", bg=bg_color, font=body_font)
+    mbti_body2.place(relx=0.5, y=280, anchor=tk.CENTER)  # Adjust y as needed
+
+    #Partner Love Language
+    ll_title = tk.Label(root, text="Partner Love Language", bg=bg_color, font=title_font)
+    ll_title.place(relx=0.5, y=360, anchor=tk.CENTER)  # Adjust y as needed
+    ll_body = tk.Label(root, text=f"{partner_love_language.replace("_", " ")}", bg=bg_color, font=body_font)
+    ll_body.place(relx=0.5, y=400, anchor=tk.CENTER)  # Adjust y as needed
+    ll_body = tk.Label(root, text=f"{data['love_languages'][partner_love_language]}", bg=bg_color, font=body_font)
+    ll_body.place(relx=0.5, y=440, anchor=tk.CENTER)  # Adjust y as needed
+
+    #Partner Interests
+    interests_title = tk.Label(root, text="Partner Interests", bg=bg_color, font=title_font)
+    interests_title.place(relx=0.5, y=520, anchor=tk.CENTER)  
+    interests_string = ', '.join(partner_interests)
+    body1 = tk.Label(root, text=f"{interests_string}", bg=bg_color, font=body_font)
+    body1.place(relx=0.5, y=560, anchor=tk.CENTER)  
+    body2 = tk.Label(root, text=f"{data['interests'][partner_interests[0]]}", bg=bg_color, font=body_font)
+    body2.place(relx=0.5, y=600, anchor=tk.CENTER)  
+
+    #Partner Values
+    values_title = tk.Label(root, text="Partner Values", bg=bg_color, font=title_font)
+    values_title.place(relx=0.5, y=680, anchor=tk.CENTER)  
+    values_string = ', '.join(partner_values)
+    body1 = tk.Label(root, text=f"{values_string}", bg=bg_color, font=body_font)
+    body1.place(relx=0.5, y=720, anchor=tk.CENTER)  
+    body2 = tk.Label(root, text=f"{data['values'][partner_values[0]]}", bg=bg_color, font=body_font)
+    body2.place(relx=0.5, y=760, anchor=tk.CENTER)  
+
+def print_inputs():
+    print("Selected MBTI:", input_selected_mbti)
+    print("Selected Love Language:", input_love_language)
+    print("Ranked Values:", input_ranked_values)
+    print("Selected Interests:", input_selected_interests)
 
 
 
@@ -537,6 +687,7 @@ def move_up():
     value_listbox.delete(selected_index)
     value_listbox.insert(selected_index - 1, item)
     value_listbox.select_set(selected_index - 1)
+    update_ranked_values()
 
 def move_down():
     selected_index = value_listbox.curselection()
@@ -549,6 +700,11 @@ def move_down():
     value_listbox.delete(selected_index)
     value_listbox.insert(selected_index + 1, item)
     value_listbox.select_set(selected_index + 1)
+    update_ranked_values()
+
+def update_ranked_values():
+    global input_ranked_values
+    input_ranked_values = [value_listbox.get(i) for i in range(value_listbox.size())]
 
 def update_tip():
     global tip_index
