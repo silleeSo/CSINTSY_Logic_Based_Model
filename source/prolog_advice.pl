@@ -35,6 +35,9 @@ interest(traveling).
 interest(sports).
 interest(music).
 interest(cooking).
+interest(writing).
+interest(science).
+interest(pet_care).
 interest(art).
 interest(gaming).
 interest(hiking).
@@ -109,6 +112,7 @@ possible_communication_style(istj, assertive).
 possible_communication_style(isfp, passive).
 possible_communication_style(estp, assertive).
 possible_communication_style(esfj, assertive).
+possible_communication_style(intj, assertive).
 
 
 
