@@ -13,3 +13,8 @@ Prolog file path: C:\Users\ADMIN\Documents\CSINTSY_Logic_Based_Model\App\prolog_
 JSON file path: C:\Users\ADMIN\Documents\CSINTSY_Logic_Based_Model\App\results_dictionary.json
 JSON file read successfully
 Prolog file processed successfully
+Base directory: C:\Users\ADMIN\Documents\CSINTSY_Logic_Based_Model\App
+Prolog file path: C:\Users\ADMIN\Documents\CSINTSY_Logic_Based_Model\App\prolog_advice.pl
+JSON file path: C:\Users\ADMIN\Documents\CSINTSY_Logic_Based_Model\App\results_dictionary.json
+JSON file read successfully
+Prolog file processed successfully
